@@ -205,6 +205,7 @@ function RegisterScreen() {
   const [nome, setNome] = useState("");
 
   async function registrarUsuario() {
+    alert("clicou");
     if (!email || !senha || !telefone || !gameId || !nome) {
       alert("Preencha todos os campos obrigatórios.");
       return;
@@ -247,7 +248,10 @@ function RegisterScreen() {
           Depois do cadastro, sua conta entra em fila de espera para aprovação da staff.
         </p>
 
-        <form className="space-y-4">
+        <form
+  className="space-y-4"
+  onSubmit={(e) => e.preventDefault()}
+>
           <Input
             label="E-mail"
             type="email"
