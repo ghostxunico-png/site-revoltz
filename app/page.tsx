@@ -1,6 +1,7 @@
 // @ts-nocheck
 "use client";
 import React, { useState } from "react";
+import { supabase } from "@/lib/supabase";
 import { motion } from "framer-motion";
 import { Shield, UserPlus, LogIn, MessageCircle, Clock, Lock, Trophy, Image, CheckCircle, Users, Crown, Code, UserCog, Radio, Bell, XCircle, Eye } from "lucide-react";
 
@@ -197,22 +198,108 @@ function Feature({ icon, title, text }) {
 }
 
 function RegisterScreen() {
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [telefone, setTelefone] = useState("");
+  const [gameId, setGameId] = useState("");
+  const [nome, setNome] = useState("");
+
+  async function registrarUsuario() {
+    if (!email || !senha || !telefone || !gameId || !nome) {
+      alert("Preencha todos os campos obrigatórios.");
+      return;
+    }
+
+    const { error } = await supabase.from("usuarios").insert([
+      {
+        email,
+        senha,
+        telefone,
+        game_id: gameId,
+        nome,
+        cargo: "Membro",
+        status: "pendente",
+        pontos: 0,
+        online: false,
+      },
+    ]);
+
+    if (error) {
+      alert("Erro ao cadastrar. Veja o console.");
+      console.log(error);
+      return;
+    }
+
+    alert("Cadastro enviado para análise da staff!");
+
+    setEmail("");
+    setSenha("");
+    setTelefone("");
+    setGameId("");
+    setNome("");
+  }
+
   return (
     <section className="max-w-xl mx-auto px-5 py-16">
       <div className="bg-zinc-900 border border-red-900/40 rounded-[2rem] p-8 shadow-2xl shadow-red-950/30">
         <h2 className="text-3xl font-black mb-2">Criar conta</h2>
-        <p className="text-zinc-400 mb-8">Depois do cadastro, sua conta entra em fila de espera para aprovação da staff.</p>
+        <p className="text-zinc-400 mb-8">
+          Depois do cadastro, sua conta entra em fila de espera para aprovação da staff.
+        </p>
+
         <form className="space-y-4">
-          <Input label="E-mail" type="email" placeholder="seuemail@gmail.com" />
-          <Input label="Senha" type="password" placeholder="Crie uma senha segura" />
-          <Input label="WhatsApp obrigatório" type="tel" placeholder="Ex: +55 63 99999-0000" required />
-          <Input label="ID dentro do Free Fire" placeholder="Ex: 123456789" />
-          <Input label="Nome dentro do jogo" placeholder="Ex: REVOLTZ Ghost" />
-          <button type="button" className="w-full py-4 rounded-2xl bg-gradient-to-r from-orange-500 to-red-700 font-bold mt-4">
+          <Input
+            label="E-mail"
+            type="email"
+            placeholder="seuemail@gmail.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+
+          <Input
+            label="Senha"
+            type="password"
+            placeholder="Crie uma senha segura"
+            value={senha}
+            onChange={(e) => setSenha(e.target.value)}
+          />
+
+          <Input
+            label="WhatsApp obrigatório"
+            type="tel"
+            placeholder="Ex: +55 63 99999-0000"
+            value={telefone}
+            onChange={(e) => setTelefone(e.target.value)}
+            required
+          />
+
+          <Input
+            label="ID dentro do Free Fire"
+            placeholder="Ex: 123456789"
+            value={gameId}
+            onChange={(e) => setGameId(e.target.value)}
+          />
+
+          <Input
+            label="Nome dentro do jogo"
+            placeholder="Ex: REVOLTZ Ghost"
+            value={nome}
+            onChange={(e) => setNome(e.target.value)}
+          />
+
+          <button
+            type="button"
+            onClick={registrarUsuario}
+            className="w-full py-4 rounded-2xl bg-gradient-to-r from-orange-500 to-red-700 font-bold mt-4"
+          >
             Enviar cadastro para análise da staff
           </button>
         </form>
-        <a href="https://chat.whatsapp.com/IQTHEokiLbz4ioAyazXADW?s=sw&p=a&mlu=2" className="mt-6 flex justify-center items-center gap-2 text-green-400">
+
+        <a
+          href="https://chat.whatsapp.com/IQTHEokiLbz4ioAyazXADW?s=sw&p=a&mlu=2"
+          className="mt-6 flex justify-center items-center gap-2 text-green-400"
+        >
           <MessageCircle className="w-4 h-4" /> Grupo de suporte no WhatsApp
         </a>
       </div>
@@ -392,11 +479,26 @@ function OnlineList({ players }) {
   );
 }
 
-function Input({ label, ...props }) {
+function Input({
+  label,
+  type = "text",
+  placeholder,
+  value,
+  onChange,
+  required = false,
+}) {
   return (
     <label className="block">
       <span className="text-sm font-bold text-zinc-300">{label}</span>
-      <input {...props} className="mt-2 w-full px-4 py-4 rounded-2xl bg-black border border-zinc-800 focus:border-orange-500 outline-none text-white" />
+
+      <input
+        type={type}
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        required={required}
+        className="mt-2 w-full px-4 py-4 rounded-2xl bg-black border border-zinc-800 focus:border-orange-500 outline-none text-white"
+      />
     </label>
   );
 }
